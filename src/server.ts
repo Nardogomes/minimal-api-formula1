@@ -15,16 +15,52 @@ const drivers = [
   { id: 3, name: "Lando Norris", team: "McLaren" },
 ]
 
+interface DriversParams {
+  id: string
+}
+
+interface TeamsParams {
+  id: string
+}
+
 server.get("/teams", async (request, reply) => {
   reply.type("application/json").code(200)
   
-  return { teams }
+  return teams
 })
 
 server.get("/drivers", async (request, reply) => {
   reply.type("application/json").code(200)
   
-  return { drivers }
+  return drivers
+})
+
+server.get<{Params: DriversParams}>("/driver/:id", async (request, reply) => {
+  const id = parseInt(request.params.id)
+
+  const driver = drivers.find(d => d.id === id)
+
+  if(!driver) {
+    reply.type("application/json").code(404)
+    return { message: "Driver not found"}
+  } else {
+    reply.type("application/json").code(200)
+    return driver
+  }
+})
+
+server.get<{Params: TeamsParams}>("/team/:id", async (request, reply) => {
+  const id = parseInt(request.params.id)
+
+  const team = teams.find(t => t.id === id)
+
+  if(!team) {
+    reply.type("application/json").code(404)
+    return { message: "Team not found"}
+  } else {
+    reply.type("application/json").code(200)
+    return team
+  }
 })
 
 server.listen({ port: 3333 }, () => {
